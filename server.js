@@ -22,11 +22,12 @@ app.use(
       "https://www.ankurhalder.in",
       "https://ankurhalder.in",
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: "GET,POST,PUT,DELETE,PATCH,UPDATE,HEAD",
+    allowedHeaders:
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    credentials: true,
   }),
 );
-
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
   process.env.MONGO_PASSWORD,
