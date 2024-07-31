@@ -80,3 +80,7 @@ Thumbs.db
 
 # Coverage directory
 coverage/
+
+
+# Added By Me
+config.env
