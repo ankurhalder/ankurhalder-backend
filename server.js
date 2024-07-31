@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 process.on("uncaughtException", (err) => {
   console.log("!Uncaught Exception 💥 Shutting down");
@@ -13,6 +14,15 @@ dotenv.config({
 });
 
 const app = require("./app");
+
+const corsOptions = {
+  origin: ["http://localhost:3000", "https://www.ankurhalder.in"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
+
+// Use CORS middleware
+app.use(cors(corsOptions));
 
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
