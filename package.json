@@ -4,7 +4,10 @@
   "description": "Backend for ankurhalder.github.io, technology used javascript, node.js, express.js , mongoDB , mongoose.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "build": "cross-env NODE_ENV=production node server.js",
+    "debug": "ndb server.js"
   },
   "repository": {
     "type": "git",
@@ -14,7 +17,11 @@
     "Ankur",
     "Halder",
     "Ankur",
-    "Halder"
+    "Halder",
+    "Node.js",
+    "Express.js",
+    "MongooDB",
+    "mongoose"
   ],
   "author": "Ankur Halder",
   "license": "AGPL-3.0",
@@ -22,17 +29,6 @@
     "url": "https://github.com/ankurhalder/ankurhalder-backend/issues"
   },
   "homepage": "https://github.com/ankurhalder/ankurhalder-backend#readme",
-  "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jsx-a11y": "^6.9.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.35.0",
-    "prettier": "^3.3.3"
-  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
@@ -48,5 +44,19 @@
     "slugify": "^1.6.6",
     "validator": "^13.12.0",
     "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.35.0",
+    "prettier": "^3.3.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
