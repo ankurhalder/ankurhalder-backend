@@ -21,5 +21,16 @@
   "bugs": {
     "url": "https://github.com/ankurhalder/ankurhalder-backend/issues"
   },
-  "homepage": "https://github.com/ankurhalder/ankurhalder-backend#readme"
+  "homepage": "https://github.com/ankurhalder/ankurhalder-backend#readme",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.35.0",
+    "prettier": "^3.3.3"
+  }
 }
