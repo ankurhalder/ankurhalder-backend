@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 const nodemailer = require("nodemailer");
+const schedule = require("node-schedule");
 const catchAsync = require("../utils/CatchAsync");
 const AppError = require("../utils/appError");
+const emailAnalyticsService = require("../utils/emailAnalyticsService");
 
 const yourEmail = process.env.EMAIL;
 const yourPassword = process.env.EMAIL_PASSWORD;
@@ -14,24 +16,35 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = async (name, recipientEmail, subject, message) => {
+const sendEmail = async (
+  name,
+  recipientEmail,
+  subject,
+  message,
+  attachments,
+) => {
   const mailOptions = {
     from: recipientEmail,
     to: yourEmail,
     subject: `Contact Form: ${subject}`,
-    text: `
-      You have a new message from ${name} (${recipientEmail}):
-
-      Subject: ${subject}
-
-      Message:
-      ${message}
+    html: `
+      <p>You have a new message from <strong>${name}</strong> (${recipientEmail}):</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong><br>${message}</p>
     `,
+    attachments: attachments.map((file) => ({
+      filename: file.originalname,
+      content: file.buffer,
+    })),
+    headers: {
+      "X-Custom-Header": "YourCustomValue",
+    },
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent:", info.response);
+    await emailAnalyticsService.trackEmail(info.messageId);
     return { success: true, message: "Email sent successfully" };
   } catch (error) {
     console.error("Error sending email:", error);
@@ -43,15 +56,28 @@ const handleContactForm = catchAsync(async (req, res, next) => {
   const { name, email, subject, message } = req.body;
 
   if (!name || !email || !subject || !message) {
-    return next(new AppError("All fields are required", 400));
+    return next(new AppError("Please fill in all required fields.", 400));
   }
 
-  const emailResponse = await sendEmail(name, email, subject, message);
-
-  if (emailResponse.success) {
-    res.status(200).send(emailResponse.message);
+  const sendAt = req.body.sendAt ? new Date(req.body.sendAt) : Date.now();
+  if (sendAt > Date.now()) {
+    schedule.scheduleJob(sendAt, async () => {
+      await sendEmail(name, email, subject, message, req.files || []);
+    });
+    res.status(200).send("Your message has been scheduled for later.");
   } else {
-    return next(new AppError("Error sending email", 500));
+    const emailResponse = await sendEmail(
+      name,
+      email,
+      subject,
+      message,
+      req.files || [],
+    );
+    if (emailResponse.success) {
+      res.status(200).send("Your message has been sent successfully.");
+    } else {
+      return next(new AppError("Error sending email", 500));
+    }
   }
 });
 

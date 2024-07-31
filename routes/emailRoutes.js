@@ -1,9 +1,8 @@
 const express = require("express");
-
-const router = express.Router();
 const emailController = require("../controllers/emailController");
 
-// Endpoint to handle contact form submissions
+const router = express.Router();
+
 router.post("/contact", emailController.handleContactForm);
 
 module.exports = router;
