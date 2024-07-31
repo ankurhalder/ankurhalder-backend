@@ -16,7 +16,11 @@ dotenv.config({
 const app = require("./app");
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://www.ankurhalder.in"],
+  origin: [
+    "http://localhost:3000",
+    "https://www.ankurhalder.in",
+    "http://localhost:5173",
+  ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
