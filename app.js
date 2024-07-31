@@ -63,6 +63,19 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/", (req, res, next) => {
+  try {
+    const response = {
+      status: "success",
+      message: "Welcome to the API!",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(new AppError("An error occurred while processing your request.", 500));
+  }
+});
 //@ 2) Routes
 
 app.use("/api/v1/users", userRouter);
