@@ -16,10 +16,17 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = catchAsync(async (recipientEmail, subject, message) => {
   const mailOptions = {
-    from: recipientEmail,
-    to: yourEmail,
-    subject: subject,
-    text: `From: ${recipientEmail}\n\n${message}`, // Include sender's email in the message body
+    from: recipientEmail, // Sender's email
+    to: yourEmail, // Your email
+    subject: `Contact Form: ${subject}`, // Including the subject from the form
+    text: `
+      You have a new message from ${recipientEmail}:
+
+      Subject: ${subject}
+
+      Message:
+      ${message}
+    `, // Clear formatting for the message body
   };
 
   try {
