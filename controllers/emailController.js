@@ -14,19 +14,19 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmail = catchAsync(async (recipientEmail, subject, message) => {
+const sendEmail = async (name, recipientEmail, subject, message) => {
   const mailOptions = {
-    from: recipientEmail, // Sender's email
-    to: yourEmail, // Your email
-    subject: `Contact Form: ${subject}`, // Including the subject from the form
+    from: recipientEmail,
+    to: yourEmail,
+    subject: `Contact Form: ${subject}`,
     text: `
-      You have a new message from ${recipientEmail}:
+      You have a new message from ${name} (${recipientEmail}):
 
       Subject: ${subject}
 
       Message:
       ${message}
-    `, // Clear formatting for the message body
+    `,
   };
 
   try {
@@ -37,8 +37,24 @@ const sendEmail = catchAsync(async (recipientEmail, subject, message) => {
     console.error("Error sending email:", error);
     throw new AppError("Error sending email", 500);
   }
+};
+
+const handleContactForm = catchAsync(async (req, res, next) => {
+  const { name, email, subject, message } = req.body;
+
+  if (!name || !email || !subject || !message) {
+    return next(new AppError("All fields are required", 400));
+  }
+
+  const emailResponse = await sendEmail(name, email, subject, message);
+
+  if (emailResponse.success) {
+    res.status(200).send(emailResponse.message);
+  } else {
+    return next(new AppError("Error sending email", 500));
+  }
 });
 
 module.exports = {
-  sendEmail,
+  handleContactForm,
 };
