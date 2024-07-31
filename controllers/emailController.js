@@ -16,12 +16,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Send Email with Custom Headers and Tracking
 const sendEmail = async (
   name,
   recipientEmail,
   subject,
   message,
   attachments,
+  sendConfirmation = false,
 ) => {
   const mailOptions = {
     from: recipientEmail,
@@ -45,6 +47,27 @@ const sendEmail = async (
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent:", info.response);
     await emailAnalyticsService.trackEmail(info.messageId);
+
+    // Send confirmation email to sender if requested
+    if (sendConfirmation) {
+      const confirmationOptions = {
+        from: yourEmail,
+        to: recipientEmail,
+        subject: `Confirmation: ${subject}`,
+        html: `
+          <p>Dear ${name},</p>
+          <p>Thank you for reaching out. Your message has been successfully sent. Here are the details:</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong><br>${message}</p>
+          <p>I will get back to you soon.</p>
+        `,
+        headers: {
+          "X-Custom-Header": "ConfirmationHeader",
+        },
+      };
+      await transporter.sendMail(confirmationOptions);
+    }
+
     return { success: true, message: "Email sent successfully" };
   } catch (error) {
     console.error("Error sending email:", error);
@@ -52,6 +75,7 @@ const sendEmail = async (
   }
 };
 
+// Handle Contact Form Submission
 const handleContactForm = catchAsync(async (req, res, next) => {
   const { name, email, subject, message } = req.body;
 
@@ -59,10 +83,11 @@ const handleContactForm = catchAsync(async (req, res, next) => {
     return next(new AppError("Please fill in all required fields.", 400));
   }
 
+  // Email Scheduling
   const sendAt = req.body.sendAt ? new Date(req.body.sendAt) : Date.now();
   if (sendAt > Date.now()) {
     schedule.scheduleJob(sendAt, async () => {
-      await sendEmail(name, email, subject, message, req.files || []);
+      await sendEmail(name, email, subject, message, req.files || [], true);
     });
     res.status(200).send("Your message has been scheduled for later.");
   } else {
@@ -72,6 +97,7 @@ const handleContactForm = catchAsync(async (req, res, next) => {
       subject,
       message,
       req.files || [],
+      true, // Request confirmation email to be sent
     );
     if (emailResponse.success) {
       res.status(200).send("Your message has been sent successfully.");
