@@ -15,18 +15,17 @@ dotenv.config({
 
 const app = require("./app");
 
-const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "https://www.ankurhalder.in",
-    "http://localhost:5173",
-  ],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-};
-
-// Use CORS middleware
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://www.ankurhalder.in",
+      "https://ankurhalder.in",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
