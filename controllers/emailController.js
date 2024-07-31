@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const schedule = require("node-schedule");
 const catchAsync = require("../utils/CatchAsync");
 const AppError = require("../utils/appError");
-const emailAnalyticsService = require("../utils/emailAnalyticsService");
+const Email = require("../models/emailModel");
 
 const yourEmail = process.env.EMAIL;
 const yourPassword = process.env.EMAIL_PASSWORD;
@@ -16,7 +16,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Send Email with Custom Headers and Tracking
 const sendEmail = async (
   name,
   recipientEmail,
@@ -39,16 +38,27 @@ const sendEmail = async (
       content: file.buffer,
     })),
     headers: {
-      "X-Custom-Header": "YourCustomValue",
+      "X-Custom-Header": "CustomValue",
     },
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent:", info.response);
-    await emailAnalyticsService.trackEmail(info.messageId);
+    // Save the email details to the database
+    await Email.create({
+      name,
+      email: recipientEmail,
+      subject,
+      message,
+      attachments: attachments.map((file) => ({
+        filename: file.originalname,
+        contentType: file.mimetype,
+      })),
+      headers: mailOptions.headers,
+      sentAt: new Date(),
+    });
 
-    // Send confirmation email to sender if requested
     if (sendConfirmation) {
       const confirmationOptions = {
         from: yourEmail,
@@ -75,7 +85,6 @@ const sendEmail = async (
   }
 };
 
-// Handle Contact Form Submission
 const handleContactForm = catchAsync(async (req, res, next) => {
   const { name, email, subject, message } = req.body;
 
@@ -83,7 +92,6 @@ const handleContactForm = catchAsync(async (req, res, next) => {
     return next(new AppError("Please fill in all required fields.", 400));
   }
 
-  // Email Scheduling
   const sendAt = req.body.sendAt ? new Date(req.body.sendAt) : Date.now();
   if (sendAt > Date.now()) {
     schedule.scheduleJob(sendAt, async () => {
@@ -97,7 +105,7 @@ const handleContactForm = catchAsync(async (req, res, next) => {
       subject,
       message,
       req.files || [],
-      true, // Request confirmation email to be sent
+      true,
     );
     if (emailResponse.success) {
       res.status(200).send("Your message has been sent successfully.");
