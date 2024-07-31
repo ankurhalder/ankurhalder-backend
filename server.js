@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const cors = require("cors");
 
 process.on("uncaughtException", (err) => {
   console.log("!Uncaught Exception 💥 Shutting down");
@@ -15,20 +14,6 @@ dotenv.config({
 
 const app = require("./app");
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://www.ankurhalder.in",
-      "https://ankurhalder.in",
-    ],
-    methods: "GET,POST,PUT,DELETE,PATCH,UPDATE,HEAD",
-    allowedHeaders:
-      "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    "Access-Control-Allow-Origin": "*",
-    credentials: true,
-  }),
-);
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
   process.env.MONGO_PASSWORD,
