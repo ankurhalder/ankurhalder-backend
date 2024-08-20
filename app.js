@@ -19,6 +19,12 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
+      "http://localhost:3000",
+      "http://192.168.0.101:5173",
+      "http://192.168.0.103:5173",
+      "http://192.168.0.103:5173",
+      "http://192.168.0.104:5173",
+      "http://192.168.0.105:5173",
       "https://www.ankurhalder.in",
       "https://ankurhalder.in",
     ],
